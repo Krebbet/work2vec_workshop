@@ -1,0 +1,36 @@
+database:
+     name: greenwichhr_w2v_workbench
+     usrid: greenwichhr_dev_1
+     password: ~!pL&F2G,#u8
+     ip: 67.227.191.254
+     port: 3306
+     
+     
+model_param:
+    model_type: nce
+    embedding_size: 300
+    vocabulary_size: 10000
+    test_size: 16
+    test_window: 100
+    batch_norm: False
+    
+    
+# model specific params!!!    
+naive_model:
+    none: none 
+    
+nce:
+    negative_samples: 64
+    
+    
+    
+    
+    
+solver_param:
+    id: default
+    epoch: 100
+    batch_size: 128
+    learning_rate: 1.0
+    num_skips: 2
+    skip_window: 2
+    
