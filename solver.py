@@ -11,8 +11,6 @@ import math
 import io
 import tensorflow as tf
 
-# this should probably be removed once i move to the sql
-from utils import generate_batch
 
 
 LOG_DIR = 'logs'
