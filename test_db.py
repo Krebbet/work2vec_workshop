@@ -1,6 +1,7 @@
 
 import MySQLdb as mysql
 import yaml
+import numpy as np
 
 PARAM_FILE_DIRECTORY = 'parameters.yml'    
 
@@ -31,3 +32,62 @@ db = mysql.connect(host=db_defs['ip'],
 
 
 print('connected to db...')  
+
+
+def mysql_query(cmd,maxrows=0):
+  db.query(cmd)
+  r=db.store_result()
+  return r.fetch_row(maxrows=maxrows)
+
+
+
+#db.query("""SHOW DATABASES""")
+str = ("""USE %s """ % 'greenwichhr_w2v_workbench')
+print(str)
+db.query(str)
+db.query("""SHOW tables""")
+r=db.store_result()
+print(r.fetch_row(maxrows=0))
+
+db.query("""DESCRIBE _test_input_pair_list""")
+
+r=db.store_result()
+print(r.fetch_row(maxrows=0))
+
+res = mysql_query("""SELECT COUNT(*) FROM _test_input_pair_list""")
+data_length = res[0][0]
+
+
+#res = mysql_query("""SELECT var_1,var_2 FROM _test_input_pair_list  LIMIT 55,10""")
+#print(res)
+
+
+
+#data = mysql_query("""SELECT var_1,var_2 FROM _test_input_pair_list LIMIT 55,10""")
+data = mysql_query("""SELECT var_1,var_2 FROM _test_input_pair_list LIMIT 55,10""")
+data = np.asarray(data)
+#print(data)
+
+number_of_samples = None
+if number_of_samples != None:
+  str = ("""SELECT var_1,var_2 FROM _test_input_pair_list LIMIT %d""" % number_of_samples)
+else:
+  str = ("""SELECT var_1,var_2 FROM _test_input_pair_list""")
+ 
+         
+data = mysql_query(str)
+         
+print('XXXXXXXXXXXXXXXXXXXXXXXXXxx')
+data = np.asarray(data)
+print(data.shape)
+x = data[:,0]
+print(x.shape)
+print(x.shape[0])
+         
+         
+         
+         
+         
+         
+         
+

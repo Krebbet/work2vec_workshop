@@ -67,7 +67,7 @@ class Solver(object):
           
     return         
 
-  def train(self,data,dictionary,reverse_dictionary,param):
+  def train(self,target_words,context,param):
     # define params locally for readability
     model = self.m     
     learning_rate = param['learning_rate'] 
@@ -108,8 +108,8 @@ class Solver(object):
     fetches.extend([self.train_op])
 
     # determine the counter values.
-    num_train = len(data)
-    num_train = 1000
+    num_train = len(context_words)
+ 
     iterations_per_epoch = max(num_train // batch_size, 1)
     if (num_train % batch_size) != 0: 
       iterations_per_epoch -= 1
@@ -143,20 +143,20 @@ class Solver(object):
       print('***********************************************')
       
       for e in range(epoch):
-        # create a mask for the data
+        # create a mask to shuffle the data
         mask = np.arange(num_train)
         np.random.shuffle(mask)
 
-        read_out = 1
         for i in range(iterations_per_epoch):
-          if (i % read_out == 0):
+          if (i % param['read_out'] == 0):
             print('%d of %d for epoch %d' %(i,iterations_per_epoch,e))
           # Grab the batch data...
-          # should replace this method to mix data!!!
-          batch,context = generate_batch(data, batch_size, num_skips, skip_window)
+          target_batch = target_words[mask[batch_size*i:batch_size*(i +1)]]
+          context_batch = context_batch[mask[batch_size*i:batch_size*(i +1)]]
+          
 
-          feed_dict={model.target_words:batch,
-                     model.context:context,
+          feed_dict={model.target_words:target_batch,
+                     model.context:context_batch,
                      model.is_training:True}      
           
 
@@ -169,22 +169,29 @@ class Solver(object):
         
         
         # epoch done, check word similarities....
-        [sim] = sess.run([model.similarity])
-        for i in range(model.test_size):
-          valid_word = reverse_dictionary[model.valid_examples[i]]
-          top_k = 8  # number of nearest neighbors
-          #x = -sim[i, :].argsort()
-          nearest = (-sim[i, :]).argsort()[1:top_k + 1]
-          log_str = 'Nearest to %s:' % valid_word
-          for k in range(top_k):
-            close_word = reverse_dictionary[nearest[k]]
-            log_str = '%s %s,' % (log_str, close_word)
-          print(log_str)        
+        # Note: I do not have access to the word library so 
+        # I cannot create my own reverse lookup...
+        if (e % param['similarity_readout'] == 0):
+          [sim] = sess.run([model.similarity])
+          for i in range(model.test_size):
+            #valid_word = reverse_dictionary[model.valid_examples[i]]
+            valid_word = model.valid_examples[i]
+            top_k = 8  # number of nearest neighbors
+            #x = -sim[i, :].argsort()
+            nearest = (-sim[i, :]).argsort()[1:top_k + 1]
+            log_str = 'Nearest to %s:' % valid_word
+            for k in range(top_k):
+              #close_word = reverse_dictionary[nearest[k]]
+              close_word = nearest[k]
+              #log_str = '%s %s,' % (log_str, close_word)
+              log_str = '%s %d,' % (log_str, close_word)
+            print(log_str)        
       
         
         #[train_acc]=sess.run([model.accuracy],feed_dict)
         #acc = self.test_acc(sess,data['X_test'],data['y_test'],test_writer,batch_size,iter = (e+1)*iterations_per_epoch)
-        saver.save(sess,model_dest, global_step=e+1)
+        if (e % param['check_point'] == 0):
+          saver.save(sess,model_dest, global_step=e+1)
         print('%d of %d epoch complete.' % (1+e,epoch))
         
         

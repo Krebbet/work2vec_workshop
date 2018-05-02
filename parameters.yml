@@ -27,10 +27,13 @@ nce:
     
     
 solver_param:
-    id: default
+    id: default                 # This is what the model will be saved under (or loaded from)
     epoch: 100
     batch_size: 128
     learning_rate: 1.0
-    num_skips: 2
-    skip_window: 2
+    read_out: 10000                   # when to read out (itteration)
+    similarity_readout: 1       # how often to check similarity readings (by epoch)
+    check_point: 1               # how often to checkpoint the model (by epoch)
+    #num_skips: 2
+    #skip_window: 2
     
