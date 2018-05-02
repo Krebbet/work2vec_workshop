@@ -7,8 +7,8 @@ import numpy as np
 import re
 import math
 
-from models.model import Net 
-from models.constants import *
+from model import Net 
+from constants import *
 
 
 class Model(Net):

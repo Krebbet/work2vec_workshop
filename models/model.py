@@ -6,7 +6,7 @@ import tensorflow as tf
 import numpy as np
 import re
 
-from models.constants import *
+from constants import *
 
 
 
