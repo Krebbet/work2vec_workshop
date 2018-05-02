@@ -148,7 +148,7 @@ def generate_batch(data, batch_size, num_skips, skip_window):
 def create_model(model_param,model_specific_params):
     
     
-    import_string = ('models.%s' % model_param['model_type'])
+    import_string = ('%s' % model_param['model_type'])
     print(import_string)
     
     model_def = importlib.import_module(import_string)
